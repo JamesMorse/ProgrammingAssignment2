@@ -11,12 +11,12 @@ makeCacheMatrix <- function(x = matrix()) {
      
      ## define get/set functions
      set <- function(setVal = matrix()) {
-          x <-- setVal
+          x <<- setVal
           # empty inverse matrix variable when resetting matrix value
           invX <-- NULL
      }
      get <- function() x
-     setInverse <- function(inverse) invX <-- inverse
+     setInverse <- function(setVal) invX <<- setVal
      getInverse <- function() invX
      
      ## return special matrix object as list of 4 function pointers
@@ -42,15 +42,17 @@ makeCacheMatrix <- function(x = matrix()) {
 cacheSolve <- function(specialMatrix, ...) {
   #retrieve inverse value and check whether set (not NULL)
   inverse <- specialMatrix$getInverse()
+  # test whether inverse is cached and if so, notify user w/ message
   if (!is.null(inverse)) {
-      message("**retrieving inverse of matrix via cache**")
-      return(inverse)
+      message("getting inverse matrix from cache")
   }
-  
-  #if code reaches this point, we must compute inverted matrix at runtime
-  rawMatrix <- specialMatrix$get()
-  inverse <- solve(rawMatrix)
-  specialMatrix$setInverse(inverse)
+  else {
+    #if code reaches this point, we must compute inverted matrix at runtime
+    rawMatrix <- specialMatrix$get()
+    inverse <- solve(rawMatrix, ...)
+    specialMatrix$setInverse(inverse)    
+  }
+
   ## return computed inverse of special matrix object 
   inverse
 }
